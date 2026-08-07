@@ -1,5 +1,7 @@
 # Premier Cloud
 
+# company
+
 Premier Cloud is an internal cloud operations platform for Premier Centre Group. The current foundation includes an enterprise dashboard, application fleet and detail views, a guided mock deployment workflow, server management, role definitions, a Prisma/PostgreSQL model, Supabase Auth utilities, seeded sample data, and validated mock APIs.
 
 ## Local setup
