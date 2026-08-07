@@ -1,100 +1,47 @@
-# vinext-starter
+# Premier Cloud
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+Premier Cloud is an internal cloud operations platform for Premier Centre Group. The current foundation includes an enterprise dashboard, application fleet and detail views, a guided mock deployment workflow, server management, role definitions, a Prisma/PostgreSQL model, Supabase Auth utilities, seeded sample data, and validated mock APIs.
 
-## Prerequisites
+## Local setup
 
-- Node.js `>=22.13.0`
+Requirements: Node.js 22+, pnpm, and PostgreSQL.
 
-## Quick Start
+1. Copy `.env.example` to `.env.local`.
+2. Set `DATABASE_URL` to a development PostgreSQL database.
+3. Add the Supabase project URL and publishable key. Never use a service-role key in browser variables.
+4. Install dependencies with `pnpm install`.
+5. Generate the Prisma client with `pnpm prisma generate`.
+6. Create the schema with `pnpm prisma db push` for local prototyping.
+7. Seed sample records with `pnpm db:seed`.
+8. Start the app with `pnpm dev`.
 
-```bash
-npm install
-npm run dev
-npm run build
-```
+The interface runs with sample data when database and Supabase values are absent. The mock deployment service never executes shell input or exposes Docker. A production worker should run in a private network with an allowlisted command surface.
 
-This starter does not use `wrangler.jsonc`.
+## Security model
 
-## Included Shape
+- Supabase sessions use cookie-based SSR utilities and PKCE.
+- Roles must be stored in Supabase `app_metadata`, not user-editable metadata.
+- Every protected server action and API must re-check identity and role.
+- Environment values store ciphertext and key versions; plaintext is returned only at initial creation.
+- Destructive operations require confirmation and produce audit records.
+- Authenticated responses must not be cached by a shared proxy.
+- Public-schema tables exposed through Supabase require RLS and explicit policies.
 
-- edit site code under `app/`
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
+## Structure
 
-## Workspace Auth Headers
+- `app/` — routes and API handlers
+- `components/` — reusable platform shell and UI
+- `lib/` — RBAC, Supabase utilities, mock data and deployment boundary
+- `prisma/` — PostgreSQL schema and sample seed
+- `worker/` — Cloudflare-compatible site entrypoint
 
-Signed-in visitors receive both `oai-authenticated-user-id` and `oai-authenticated-user-email`. Private Sites require every visitor to sign in; public Sites may also have anonymous visitors, for whom neither header is present.
+## Current prototype routes
 
-The user ID is stable for the same user on the same Site and different across Sites. Email and name are intended for display or contact purposes.
+- `/` — infrastructure overview
+- `/login` — company sign-in prototype
+- `/applications` — searchable fleet table
+- `/applications/hr-portal` — application details
+- `/deploy` — seven-step deployment wizard
+- `/servers` — server fleet
 
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
-
-Treat the full name as optional and fall back to email when it is absent:
-
-```tsx
-import { headers } from "next/headers";
-
-export default async function Home() {
-  const requestHeaders = await headers();
-  const userId = requestHeaders.get("oai-authenticated-user-id");
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
-
-  const displayName = fullName ?? email;
-  // ...
-}
-```
-
-## Optional Dispatch-Owned ChatGPT Sign-In
-
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
-
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
-
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
-
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
-
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
-
-## Useful Commands
-
-- `npm run dev`: start local development
-- `npm run build`: verify the vinext build output
-- `npm test`: build the starter and verify its rendered loading skeleton
-- `npm run db:generate`: generate Drizzle migrations after schema changes
-
-## Learn More
-
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+Database, backups, monitoring, logs, users, billing, and settings are navigation-ready and planned for the next build phase.

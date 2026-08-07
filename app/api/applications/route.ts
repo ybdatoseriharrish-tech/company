@@ -1,0 +1,4 @@
+import { z } from "zod"; import { applications } from "@/lib/mock-data";
+const schema=z.object({name:z.string().min(2).max(80),domain:z.string().min(3),repository:z.string().regex(/^[\w.-]+\/[\w.-]+$/),branch:z.string().min(1),framework:z.enum(["Next.js","React","Node.js","Python","Static website","Docker image"]),port:z.number().int().min(1).max(65535)});
+export async function GET(){return Response.json({data:applications});}
+export async function POST(request:Request){try{const input=schema.safeParse(await request.json());if(!input.success)return Response.json({error:{code:"VALIDATION_ERROR",message:"Invalid application configuration",details:input.error.flatten()}},{status:400});return Response.json({data:{id:crypto.randomUUID(),...input.data,status:"QUEUED"}},{status:201});}catch{return Response.json({error:{code:"BAD_REQUEST",message:"The request could not be processed"}},{status:400})}}

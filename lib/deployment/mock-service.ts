@@ -1,0 +1,2 @@
+export const deploymentStages=["Repository cloned","Dependencies installed","Application built","Docker image created","Container started","Domain configured","Health check completed"] as const;
+export async function queueMockDeployment(input:{repository:string;branch:string;framework:string;port:number}){return {id:crypto.randomUUID(),status:"QUEUED",...input,stages:deploymentStages.map(name=>({name,status:"PENDING"}))};}
