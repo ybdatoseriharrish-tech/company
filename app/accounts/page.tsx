@@ -1,0 +1,23 @@
+"use client";
+import { useState } from "react";
+import { ArrowDownLeft, ArrowUpRight, Banknote, Download, LockKeyhole, ReceiptText, WalletCards } from "lucide-react";
+import { CloudShell } from "@/components/CloudShell";
+import { financeMetrics } from "@/lib/company-data";
+
+const tx=[
+ ["INV-2026-0819","Kelana Retail Sdn Bhd","Invoice payment","+ RM18,400","Income"],
+ ["EXP-2026-188","Aina Mohamad","Client site travel","− RM1,240","Expense"],
+ ["BILL-2026-094","AWS Asia Pacific","Cloud infrastructure","− RM6,820","Payable"],
+ ["INV-2026-0816","Teguh Manufacturing","Consulting retainer","+ RM12,000","Income"],
+];
+export default function AccountsPage(){
+ const [payroll,setPayroll]=useState("Awaiting Finance Approval"); const [toast,setToast]=useState(""); const act=(s:string)=>{setToast(s);setTimeout(()=>setToast(""),2200)};
+ return <CloudShell title="Accounts" eyebrow="COMPANY OS · FINANCE CONTROL" action={<button className="primary-action" onClick={()=>act("New transaction opened")}><ReceiptText size={14}/> New transaction</button>}>
+  <section className="os-hero finance"><div><span className="os-kicker"><i/> FINANCE CONTROL</span><h2>Every ringgit, traceable.</h2><p>Income, expenses, purchases and payroll—controlled from request to reconciliation.</p></div><button className="secondary-action" onClick={()=>act("August report downloaded")}><Download size={13}/> Export report</button></section>
+  <section className="os-metrics finance-grid">{financeMetrics.map((m,i)=><article key={m.label}><div className={`os-icon ${m.tone}`}>{i===0?<WalletCards/>:i===1||i===3?<ArrowDownLeft/>:i===2||i===4?<ArrowUpRight/>:<Banknote/>}</div><span>{m.label}</span><strong>{m.value}</strong><small className={m.tone}>{m.note}</small></article>)}</section>
+  <section className="os-split finance-split"><article className="os-panel payroll-card"><header><div><small>HR → ACCOUNTS HANDOFF</small><h3>August 2026 payroll</h3></div><span className="os-pill amber">{payroll}</span></header><div className="payroll-amount"><span>PAY-0826</span><strong>RM63,400</strong><small>128 employees · HR approved 13 Aug, 4:32 PM</small></div><div className="check-list"><span>✓ Attendance and overtime verified</span><span>✓ Statutory deductions calculated</span><span>✓ HR approval and audit trail attached</span></div><div className="payroll-actions"><button onClick={()=>act("Payroll details opened")}>Review details</button><button disabled={payroll!=="Awaiting Finance Approval"} onClick={()=>{setPayroll("Payment Processing");act("Payroll approved for payment")}}>Approve payment</button></div><p className="security-rule"><LockKeyhole size={13}/><span>Accounts can approve payment but cannot change employee salary or bank details.</span></p></article>
+  <article className="os-panel"><header><div><small>PURCHASE CONTROL</small><h3>PR-2026-0042</h3></div><span className="os-pill violet">CFO approval</span></header><div className="purchase-title"><b>14 laptops for Operations</b><strong>RM14,500</strong></div><div className="mini-timeline">{["Requested","Manager","Finance Manager","CFO","Purchase order","Received"].map((s,i)=><span className={i<3?"done":i===3?"active":""} key={s}><i/>{s}</span>)}</div><button className="text-action" onClick={()=>act("Purchase audit trail opened")}>View full audit trail →</button></article></section>
+  <section className="os-panel os-table-panel"><header><div><small>LEDGER ACTIVITY</small><h3>Recent transactions</h3></div><div className="action-summary"><span><b>7</b> invoices</span><span><b>3</b> expenses</span><span><b>2</b> purchase orders</span></div></header><div className="dark-table-wrap"><table className="os-table"><thead><tr><th>REFERENCE</th><th>COUNTERPARTY</th><th>DESCRIPTION</th><th>AMOUNT</th><th>CATEGORY</th><th>STATUS</th></tr></thead><tbody>{tx.map(t=><tr key={t[0]}><td><b>{t[0]}</b></td><td>{t[1]}</td><td>{t[2]}</td><td className={t[3].startsWith("+")?"green-text":""}><b>{t[3]}</b></td><td>{t[4]}</td><td><span className="os-pill green">Posted</span></td></tr>)}</tbody></table></div></section>
+  {toast&&<div className="dark-toast">✓ {toast}</div>}
+ </CloudShell>
+}

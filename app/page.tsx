@@ -1,101 +1,17 @@
-"use client";
+import Link from "next/link";
+import { Activity, ArrowRight, Boxes, CheckCircle2, CircleDollarSign, Clock3, Server, ShieldAlert, UsersRound, WalletCards } from "lucide-react";
+import { CloudShell } from "@/components/CloudShell";
 
-import { useState } from "react";
-
-const nav = [
-  ["Dashboard", "grid"], ["Applications", "apps"], ["Deploy", "plus"],
-  ["Servers", "server"], ["Databases", "database"], ["Backups", "backup"],
-  ["Monitoring", "pulse"], ["Logs", "logs"], ["Users & permissions", "users"],
-  ["Billing", "billing"], ["Settings", "settings"],
+const signals=[
+ {label:"Cash position",value:"RM482,300",note:"Healthy · +8.4%",icon:WalletCards,tone:"green"},
+ {label:"Workforce",value:"128",note:"113 present today",icon:UsersRound,tone:"blue"},
+ {label:"Cloud uptime",value:"99.98%",note:"10 of 12 apps online",icon:Activity,tone:"violet"},
+ {label:"Open approvals",value:"14",note:"3 high-value items",icon:Clock3,tone:"amber"},
 ];
-
-const metrics = [
-  { label: "Total applications", value: "12", note: "+2 this month", tone: "violet", icon: "apps" },
-  { label: "Applications running", value: "10", note: "All systems normal", tone: "green", icon: "check" },
-  { label: "Applications offline", value: "2", note: "Requires attention", tone: "red", icon: "warning" },
-];
-
-const apps = [
-  { name: "HR Portal", type: "Next.js", status: "Running", domain: "hr.premiercentre.com", cpu: 34, ram: 46, color: "#7c5cff" },
-  { name: "Retail POS", type: "Node.js", status: "Running", domain: "pos.premiercentre.com", cpu: 21, ram: 58, color: "#35c993" },
-  { name: "Finance API", type: "Python", status: "Running", domain: "api.premiercentre.com", cpu: 43, ram: 69, color: "#3b8cf7" },
-  { name: "Legacy CRM", type: "Docker", status: "Offline", domain: "crm.premiercentre.com", cpu: 0, ram: 0, color: "#f76565" },
-];
-
-const activity = [
-  { title: "HR Portal deployed", meta: "main · a83f21d", time: "4 min ago", state: "success" },
-  { title: "Database backup completed", meta: "premier-production · 2.4 GB", time: "19 min ago", state: "success" },
-  { title: "Legacy CRM stopped", meta: "Stopped by Amir Rahman", time: "1 hr ago", state: "error" },
-  { title: "Finance API deployed", meta: "release/v2.4 · f672cb1", time: "3 hrs ago", state: "success" },
-];
-
-function Icon({ name }: { name: string }) {
-  const chars: Record<string, string> = { grid: "⊞", apps: "◈", plus: "+", server: "▤", database: "◉", backup: "↻", pulse: "⌁", logs: "≡", users: "♙", billing: "▣", settings: "⚙", check: "✓", warning: "!", bell: "♢" };
-  return <span className="icon" aria-hidden="true">{chars[name] || "•"}</span>;
-}
-
-export default function Home() {
-  const [active, setActive] = useState("Dashboard");
-  const [toast, setToast] = useState("");
-
-  function act(message: string) {
-    setToast(message);
-    window.setTimeout(() => setToast(""), 2400);
-  }
-
-  return (
-    <main className="shell">
-      <aside className="sidebar">
-        <div className="brand"><div className="brandmark"><span>◆</span></div><div><b>Premier</b><strong>Cloud</strong></div></div>
-        <nav aria-label="Primary navigation">
-          <p className="nav-label">WORKSPACE</p>
-          {nav.slice(0, 8).map(([label, icon]) => (
-            <button key={label} className={active === label ? "nav-item active" : "nav-item"} onClick={() => { setActive(label); act(`${label} selected — prototype view`); }}>
-              <Icon name={icon} /><span>{label}</span>{label === "Logs" && <small>8</small>}
-            </button>
-          ))}
-          <p className="nav-label manage">MANAGEMENT</p>
-          {nav.slice(8).map(([label, icon]) => (
-            <button key={label} className={active === label ? "nav-item active" : "nav-item"} onClick={() => { setActive(label); act(`${label} selected — prototype view`); }}><Icon name={icon} /><span>{label}</span></button>
-          ))}
-        </nav>
-        <div className="sidebar-foot">
-          <div className="system"><span className="live-dot"/><div><b>All systems operational</b><small>Last checked 30 sec ago</small></div></div>
-          <div className="profile"><div className="avatar">AR</div><div><b>Amir Rahman</b><small>Administrator</small></div><button aria-label="Profile menu">•••</button></div>
-        </div>
-      </aside>
-
-      <section className="workspace">
-        <header className="topbar">
-          <div><h1>{active}</h1><p>Friday, 7 August 2026 <span>•</span> Kuala Lumpur</p></div>
-          <div className="top-actions"><button className="icon-button" aria-label="Notifications"><Icon name="bell"/><i/></button><button className="deploy" onClick={() => act("Deployment flow opened")}>＋ <span>Deploy application</span></button></div>
-        </header>
-
-        <div className="content">
-          <section className="hero-row">
-            <div className="welcome"><p className="eyebrow"><span/> PREMIER CLOUD · CONTROL CENTRE</p><h2>Good morning, Amir.</h2><p>Your infrastructure is healthy. <b>10 of 12</b> applications are running normally.</p></div>
-            <div className="uptime"><div className="uptime-label"><span>Platform uptime</span><b>99.98%</b></div><div className="uptime-bars">{Array.from({length: 40}, (_,i) => <i key={i} className={i === 27 ? "warn" : ""}/>)}</div><div className="uptime-foot"><span>30 days ago</span><span>Today</span></div></div>
-          </section>
-
-          <section className="metric-grid">
-            {metrics.map(m => <article className="metric-card" key={m.label}><div className={`metric-icon ${m.tone}`}><Icon name={m.icon}/></div><div><p>{m.label}</p><strong>{m.value}</strong><small className={m.tone}>{m.note}</small></div></article>)}
-            <article className="metric-card resources"><div className="resource-head"><p>Resource usage</p><span>LIVE</span></div><div className="resource-row"><b>CPU</b><div><i style={{width:"42%"}}/></div><strong>42%</strong></div><div className="resource-row"><b>Memory</b><div><i style={{width:"68%"}}/></div><strong>68%</strong></div><div className="resource-row"><b>Storage</b><div><i className="gold" style={{width:"74%"}}/></div><strong>74%</strong></div></article>
-          </section>
-
-          <section className="panel applications">
-            <div className="panel-head"><div><h3>Applications</h3><p>Live overview across your infrastructure</p></div><button onClick={() => act("Applications view opened")}>View all <span>→</span></button></div>
-            <div className="table-wrap"><table><thead><tr><th>APPLICATION</th><th>STATUS</th><th>CPU</th><th>MEMORY</th><th>DOMAIN</th><th>QUICK ACTIONS</th></tr></thead><tbody>
-              {apps.map(app => <tr key={app.name}><td><div className="app-name"><i style={{background:app.color}}>{app.name.slice(0,2).toUpperCase()}</i><div><b>{app.name}</b><small>{app.type}</small></div></div></td><td><span className={`status ${app.status.toLowerCase()}`}><i/>{app.status}</span></td><td><div className="usage"><span><i style={{width:`${app.cpu}%`}}/></span><b>{app.cpu}%</b></div></td><td><div className="usage"><span><i style={{width:`${app.ram}%`}}/></span><b>{app.ram}%</b></div></td><td><a href={`https://${app.domain}`} target="_blank" rel="noreferrer">{app.domain} ↗</a></td><td><div className="quick"><button onClick={() => act(`${app.name} restart requested`)} title="Restart">↻</button><button onClick={() => act(`${app.name} logs opened`)} title="Logs">≡</button><button onClick={() => act(`${app.name} menu opened`)} title="More">•••</button></div></td></tr>)}
-            </tbody></table></div>
-          </section>
-
-          <section className="bottom-grid">
-            <article className="panel activity"><div className="panel-head"><div><h3>Recent activity</h3><p>Deployments, backups and system events</p></div><button onClick={() => act("Activity log opened")}>View all <span>→</span></button></div><div className="activity-list">{activity.map((item,i) => <div className="activity-row" key={item.title}><div className={`activity-icon ${item.state}`}>{item.state === "success" ? "✓" : "!"}</div><div><b>{item.title}</b><small>{item.meta}</small></div><time>{item.time}</time>{i < activity.length-1 && <span className="connector"/>}</div>)}</div></article>
-            <article className="panel alerts"><div className="panel-head"><div><h3>Security alerts</h3><p>Items that need your attention</p></div><span className="count">3 OPEN</span></div><div className="alert high"><i>!</i><div><b>Multiple failed login attempts</b><small>18 attempts from 103.14.22.91</small><span>2 min ago</span></div><button onClick={() => act("Alert marked reviewed")}>Review</button></div><div className="alert medium"><i>!</i><div><b>SSL certificate expiring soon</b><small>crm.premiercentre.com · 8 days</small><span>4 hrs ago</span></div><button onClick={() => act("Certificate details opened")}>Review</button></div><button className="all-alerts" onClick={() => act("Security centre opened")}>View security centre <span>→</span></button></article>
-          </section>
-        </div>
-      </section>
-      {toast && <div className="toast"><span>✓</span>{toast}</div>}
-    </main>
-  );
-}
+export default function Home(){return <CloudShell title="Executive Overview" eyebrow="PREMIER CLOUD · COMPANY OPERATIONS OS" action={<Link className="primary-action" href="/approvals">Review approvals <ArrowRight size={13}/></Link>}>
+ <section className="os-hero"><div><span className="os-kicker"><i/> LIVE COMPANY PULSE</span><h2>Good morning, Amir.</h2><p>Your people, finances and infrastructure are operating normally. Fourteen decisions need attention.</p></div><div className="os-period">FRIDAY · 14 AUGUST 2026 <b>Kuala Lumpur · 09:42 MYT</b></div></section>
+ <section className="os-metrics">{signals.map(s=><article key={s.label}><div className={`os-icon ${s.tone}`}><s.icon/></div><span>{s.label}</span><strong>{s.value}</strong><small className={s.tone}>{s.note}</small></article>)}</section>
+ <section className="os-split"><article className="os-panel"><header><div><small>ACTION CENTRE</small><h3>Decisions awaiting leadership</h3></div><Link className="text-action" href="/approvals">View all →</Link></header><div className="request-list"><Link href="/approvals"><div className="request-icon payroll"><CircleDollarSign/></div><span><small>PAYROLL · PAY-0826</small><b>August payroll · 128 employees</b><em>HR approved · Finance action required</em></span><strong>RM63,400</strong><ArrowRight/></Link><Link href="/approvals"><div className="request-icon"><Boxes/></div><span><small>PURCHASE · PR-2026-0042</small><b>14 laptops for Operations</b><em>Finance Manager approved · CFO action required</em></span><strong>RM14,500</strong><ArrowRight/></Link><Link href="/approvals"><div className="request-icon"><ShieldAlert/></div><span><small>SECURITY · SEC-2026-019</small><b>CRM certificate expires in 8 days</b><em>Infrastructure action required</em></span><strong>High</strong><ArrowRight/></Link></div></article>
+ <article className="os-panel"><header><div><small>CONNECTED OPERATIONS</small><h3>Company health</h3></div><span className="os-pill green">All systems normal</span></header><div className="health-stack"><Link href="/hr"><UsersRound/><span><b>HR & People</b><small>4 leave · 6 overtime · payroll preparing</small></span><CheckCircle2/></Link><Link href="/accounts"><WalletCards/><span><b>Accounts</b><small>7 invoices · 3 expenses · 2 purchase orders</small></span><CheckCircle2/></Link><Link href="/applications"><Server/><span><b>Cloud Operations</b><small>10 running · 2 offline · 74% storage</small></span><ShieldAlert/></Link></div></article></section>
+ <section className="os-panel"><header><div><small>AI OPERATIONS BRIEF</small><h3>What deserves attention today</h3></div><span className="os-pill violet">3 insights</span></header><div className="insight-grid"><div><i>01</i><span><b>Payroll is ready for Finance</b><small>All 128 employee records passed validation. Four manual exceptions were resolved by HR.</small></span></div><div><i>02</i><span><b>Storage will reach 80% in 19 days</b><small>Backups are the fastest-growing category. Review retention before adding capacity.</small></span></div><div><i>03</i><span><b>Receivables concentration increased</b><small>Two customers represent 41% of RM76,300 outstanding. Follow-up is recommended.</small></span></div></div></section>
+ </CloudShell>}
